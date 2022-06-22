@@ -1,3 +1,7 @@
+await provider.getNetwork()
+provider = ethers.provider
+await provider.getNetwork()
+provider = ethers.provider
 ethers.utils.getAddress(await provider.getNetwork())
 await provider.getNetwork()
 provider.getNetwork()

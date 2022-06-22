@@ -1,36 +1,42 @@
 <template>
   <v-app dark>
     <v-main v-resize="onResize">
-      <v-container class="main-layout py-0">
-        <div class="main-layout__navigation">
-          <div class="main-layout__bar main-layout__logo">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.392.106-.803.162-1.227.162-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z"></path></g></svg>
+      <div class="twitter">
+        <div class="twitter-item twitter-navigation">
+          <div class="twitter-item__wrap">
+            <div class="twitter-item__bar">
+              <div class="twitter-logo">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.392.106-.803.162-1.227.162-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z"></path></g></svg>
+              </div>
+            </div>
+            <div class="twitter-item__content">
+              <v-list rounded>
+                <v-list-item-group v-model="link">
+                  <v-list-item
+                    v-for="(item, i) in menus"
+                    :key="i"
+                    :to="item.link"
+                    :value="item.link"
+                    class="main-layout-item"
+                    active-class="main-layout-item--active"
+                  >
+                    <v-list-item-icon>
+                      <div v-if="currentLink === item.link" class="main-layout__icon" v-html="item.active"></div>
+                      <div v-else class="main-layout__icon" v-html="item.icon"></div>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                      <v-list-item-title class="main-layout__title" v-text="item.text"></v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list-item-group>
+              </v-list>
+            </div>
           </div>
-          <v-list rounded>
-            <v-list-item-group v-model="link">
-              <v-list-item
-                v-for="(item, i) in menus"
-                :key="i"
-                :to="item.link"
-                :value="item.link"
-                class="main-layout-item"
-                active-class="main-layout-item--active"
-              >
-                <v-list-item-icon>
-                  <div v-if="currentLink === item.link" class="main-layout__icon" v-html="item.active"></div>
-                  <div v-else class="main-layout__icon" v-html="item.icon"></div>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title class="main-layout__title" v-text="item.text"></v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list-item-group>
-          </v-list>
         </div>
-        <div class="main-layout__content">
+        <div class="twitter-item twitter-item--column twitter-item--scrolling">
           <Nuxt />
         </div>
-      </v-container>
+      </div>
     </v-main>
     <notifier />
   </v-app>
@@ -112,29 +118,33 @@ export default {
   },
   watch: {
     address(val) {
+      console.log('update address', val)
       const menu = this.menus.find((x) => x.id === 'profile')
       if (!menu) return
       menu.link = '/' + val.toLowerCase()
     }
   },
   mounted() {
-    // this.getAddress()
+    this.getAddress()
   },
   methods: {
     onResize() {
       const windowHeight = window.innerHeight
+      const windowWidth = window.innerWidth
       const root = document.documentElement
-      root.style.setProperty('--contentHeight', windowHeight)
-      console.log(windowHeight)
+      root.style.setProperty('--contentHeight', windowHeight + 'px')
+      root.style.setProperty('--contentWidth', windowWidth + 'px')
+      root.style.setProperty('--menuWidth', (windowWidth * 0.3) + 'px')
+      root.style.setProperty('--mainWidth', (windowWidth * 0.4) + 'px')
+      root.style.setProperty('--sidebarWidth', (windowWidth * 0.25) + 'px')
     },
     async getAddress() {
       if (!window.ethereum) return
-      const provider = new this.$ethers.providers.Web3Provider(window.ethereum)
-      const signer = provider.getSigner()
-      this.address = await signer.getAddress()
+      const { address } = await this.$web3.getAccount()
+      // this.address = address
       const menu = this.menus.find((x) => x.id === 'profile')
       if (!menu) return
-      menu.link = '/' + this.address.toLowerCase()
+      menu.link = '/' + address.toLowerCase()
     },
     // onChangeAccount() {},
   }

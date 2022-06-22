@@ -1,55 +1,56 @@
 <template>
-  <div class="home-page main-layout__container">
-    <div class="main-layout__main">
-      <div class="main-layout__bar">
-        <div class="main-layout__title px-4" style="font-weight: 700">
+  <div class="twitter-item__wrap">
+    <div class="twitter-item__main twitter-item__main--border">
+      <div class="twitter-item__bar">
+        <div class="main-layout__title" style="font-weight: 700">
           หน้าแรก
         </div>
       </div>
-      <div class="home-page__box py-3 px-4">
-        <div class="d-flex" style="position: relative">
-          <div class="mr-3">
-            <v-avatar>
-              <v-img :src="avatar" width="48" height="48" contain />
-            </v-avatar>
-          </div>
-          <div style="width: 100%">
-            <div>
-              <v-textarea
-                v-model="tweetText"
-                :rules="[(v) => !!v && v.length < maxTweetLen || 'length']"
-                :rows="3"
-                :counter="maxTweetLen"
-                placeholder="มีอะไรเกิดขึ้นบ้าง"
-                class="tweet-box"
-                auto-grow
-                outlined
-                hide-details
-              />
+       <div class="twitter-item__content">
+        <div class="home-page__box py-3 px-4">
+          <div class="d-flex" style="position: relative">
+            <div class="mr-3">
+              <v-avatar>
+                <v-img :src="avatar" width="48" height="48" contain />
+              </v-avatar>
             </div>
-            <div class="d-flex align-center pt-3">
-              <v-spacer />
-              <div v-if="tweetText.length > maxTweetLen" class="text-body-2 error--text px-4">{{ maxTweetLen - tweetText.length  }}</div>
-              <v-btn color="blue white--text" :disabled="!tweetText" depressed rounded @click="addTweet">ทวีต</v-btn>
+            <div style="width: 100%">
+              <div>
+                <v-textarea
+                  v-model="tweetText"
+                  :rules="[(v) => !!v && v.length < maxTweetLen || 'length']"
+                  :rows="2"
+                  :counter="maxTweetLen"
+                  placeholder="มีอะไรเกิดขึ้นบ้าง"
+                  class="tweet-box"
+                  auto-grow
+                  outlined
+                  hide-details
+                />
+              </div>
+              <div class="d-flex align-center pt-3">
+                <v-spacer />
+                <div v-if="tweetText.length > maxTweetLen" class="text-body-2 error--text px-4">{{ maxTweetLen - tweetText.length  }}</div>
+                <v-btn color="blue white--text" :disabled="!tweetText" depressed rounded @click="addTweet">ทวีต</v-btn>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="home-page__feeds">
-        <div>
-          <template v-for="item, i in feeds">
-            <feed-item :key="item.id + '-' + Date.now()" :item="item" @delete="onDelete" />
-            <v-divider v-if="i < feeds.length" :key="'divider-' + i" />
-          </template>
+        <div class="home-page__feeds">
+          <div>
+            <template v-for="item, i in feeds">
+              <feed-item :key="item.id + '-' + Date.now()" :item="item" @delete="onDelete" />
+              <v-divider v-if="i < feeds.length" :key="'divider-' + i" />
+            </template>
+          </div>
         </div>
-      </div>
+       </div>
     </div>
-    <div class="main-layout__sidebar">
-      <div class="main-layout__bar">
-        <div class="pa-4">
-          <v-text-field prepend-inner-icon="mdi-magnify" placeholder="ค้นหาทวิตเตอร์" single-line full-width dense rounded filled hide-details />
-        </div>
+    <div class="twitter-item__sidebar">
+      <div class="twitter-item__bar">
+        <v-text-field prepend-inner-icon="mdi-magnify" placeholder="ค้นหาทวิตเตอร์" single-line full-width dense rounded filled hide-details />
       </div>
+      <div class="twitter-item__content"></div>
     </div>
   </div>
 </template>
@@ -97,7 +98,7 @@ export default {
     async getAllTweets(address) {
       try {
         const { address } = await this.$web3.getAccount()
-        console.log(address)
+        // console.log(address)
         // if (!this.$twitter) throw new Error('not load smart contract')
         const twitter = this.$web3.twitterContract()
         const tweets = await twitter.getListTweets()
@@ -126,12 +127,11 @@ export default {
     async addTweet() {
       try {
         if (!window.ethereum) return
-        const provider = new this.$ethers.providers.Web3Provider(window.ethereum)
-        const signer = provider.getSigner()
-        const address = await signer.getAddress()
+        const { address } = await this.$web3.getAccount()
+        const twitter = this.$web3.twitterContract()
         const timestamp = dayjs().unix()
         const text = this.tweetText.replace( /(<([^>]+)>)/ig, '')
-        await this.twitterContract.addTweet(text, timestamp, false)
+        await twitter.addTweet(text, timestamp, false)
         this.tweetText = ''
         this.getAllTweets(address)
       } catch (error) {
@@ -143,10 +143,9 @@ export default {
     async onDelete(item) {
       try {
         if (!window.ethereum) return
-        const provider = new this.$ethers.providers.Web3Provider(window.ethereum)
-        const signer = provider.getSigner()
-        const address = await signer.getAddress()
-        await this.twitterContract.deleteTweet(item.id, true)
+        const { address } = await this.$web3.getAccount()
+        const twitter = this.$web3.twitterContract()
+        await twitter.deleteTweet(item.id, true)
         this.getAllTweets(address)
       } catch (error) {
         console.error('Error submitting new Tweet', error)
@@ -164,6 +163,9 @@ export default {
     width: 100%;
     min-height: 128px;
     border-bottom: thin solid rgba(0, 0, 0, 0.12);
+  }
+  &__feed {
+
   }
 }
 </style>
