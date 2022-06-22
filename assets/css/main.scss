@@ -1,0 +1,123 @@
+:root {
+  --contentHeight: 100;
+}
+body {
+  overscroll-behavior-y: none;
+}
+
+.main-layout {
+  position: fixed;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  // position: relative;
+  display: flex;
+  height: 100%;
+  max-height: var(--contentHeight);
+  // overflow: hidden;
+
+  $root: &;
+
+  &__navigation {
+    position: sticky;
+    top: 0;
+    box-sizing: content-box;
+    width: 275px;
+    height: var(--contentHeight);
+    overflow: hidden;
+    overflow-y: auto;
+    padding-top: 56px;
+
+    & > #{$root}__logo {
+      width: 56px;
+      height: 56px;
+      width: 100%;
+      line-height: 20px;
+      padding-left: 16px;
+      padding-right: 16px;
+
+      & > svg {
+        width: 50px;
+        height: 30px;
+        fill: rgb(29, 155, 240);
+      }
+    }
+  }
+
+  &__bar {
+    width: 100%;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    z-index: 9;
+  }
+
+  &__content {
+    max-width: 990px;
+    width: 100%;
+    height: 100%;
+    border-left: thin solid rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    overflow-y: auto;
+    // &-left {
+    //   width: 598px;
+    // }
+
+    & > #{$root}__container {
+      display: flex;
+      height: 100%;
+
+      & > #{$root}__main {
+        position: relative;
+        width: 598px;
+        // flex: 0 598px;
+        height: var(--contentHeight);
+        padding-top: 56px;
+        // overflow: hidden;
+        // overflow-y: auto;
+      }
+
+      & > #{$root}__sidebar {
+        position: relative;
+        border-left: thin solid rgba(0, 0, 0, 0.12);
+        height: var(--contentHeight);
+        // box-sizing: content-box;
+        padding-top: 56px;
+        flex: 1;
+        // overflow: hidden;
+        // overflow-y: auto;
+      }
+    }
+  }
+
+  &__icon {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  &__title {
+    font-size: 20px;
+  }
+
+  &-item {
+    #{$root}__title {
+      font-weight: 400 !important;
+    }
+    &--active {
+      #{$root}__title {
+        font-weight: 600 !important;
+      }
+      &::before {
+        background-color: transparent !important;
+      }
+    }
+  }
+}
+
+.tweet-box {
+  &.v-text-field--outlined fieldset {
+    border: none !important;
+  }
+}
